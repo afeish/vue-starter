@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vue02</title>
+</head>
+<body>
+
+<!-- 
+其实就是两种编程思维方式的转变：
+1. 过去，我们怎么触发这一个 span 的展现与否呢？
+
+事件驱动
+hook function(钩子函数)： 在一个事件驱动的模型下，在未来有可能被执行/回调的函数
+通过定义一些触发函数，加一些事件（比如用户单击，双击），再进行 dom 的更改
+
+优点：直接
+缺点：可复用性差；把逻辑性、业务性的操作和操作 dom 混在一起了；页面的组成偏胶水化
+
+2. 现在， 响应式的前端编写
+总体来说，把一些业务性的操作和底层dom 的操作进行了剥离，而且是以数据为核心的（）。
+仍然有可能需要操作 dom api，但是在这种模式下，对原生的 dom api 进行了封装；
+还能对于一些常用的组件式的片段(比如这个片段包括多个元素，（比如一个div，一个table，两个button）)进行一个封装，使其成为一个组件（component），更利于复用
+
+
+ -->
+<div id="app">
+	<span id="sp1" v-bind:title="message" style="display:inline-block;" onclick="sp1OnClick()">
+		1st span
+	</span>
+
+	<br>
+
+
+	<span id="sp2" v-bind:title="message" v-bind:style="spanVisiable">
+		2nd span
+
+	</span>
+
+	<br>
+
+<!-- 
+测试 vue 的数据绑定是单向的还是双向的
+
+1. 当 model 发生变化时，会响应到 dom 上
+app.sp3_dis='none'
+
+2. 当 dom 发生变化时，是否会响应在 model 上
+
+
+ -->
+	<span id="sp3" v-bind:title="message" :style="{display: sp3_dis, color:'green'}">
+		3rd span
+	</span>
+
+	<br>
+
+	<input type="text" name="name" v-model="username">
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script type="text/javascript">
+	var app = new Vue({
+	  el: '#app',
+	  data: {
+	    message: 'Hello Vue!',
+	    spanVisiable: {
+	    	display: "inline-block",
+	    	color: 'red'
+	    },
+	    sp3_dis: 'inline-block',
+	    username: 'user'
+	  }
+	})
+
+	function sp1OnClick() {
+		document.getElementById('sp1').style.display='none'
+	}
+</script>
+
+</body>
+</html>

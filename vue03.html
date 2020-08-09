@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vue03</title>
+</head>
+<body>
+
+
+<div id="app">
+	<br>
+
+	<input type="password" name="pass1" v-model="pass1">
+	<input type="password" name="pass2" v-model="pass2" @blur="validatePass()">
+	<span :style="{color: 'red', display: passUnmatch}">password unmatch, try input it again</span>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<script type="text/javascript">
+	var app = new Vue({
+	  el: '#app',
+	  data: {
+	    username: 'user',
+	    pass1: '',
+	    pass2: '',
+	    passUnmatch: 'none',
+	    counter: 0
+	  },
+	  methods: {
+	  	validatePassword: function(){
+	  		console.log('validating password')
+	  	},
+
+
+	  	validatePass() {
+	  		console.log('validatePass')
+
+	  		if (this.pass1 != this.pass2) {
+	  			this.passUnmatch = 'inline-block'
+	  		} else {
+	  			this.passUnmatch = 'none'
+
+	  		}
+
+	  	}
+
+	  }
+	})
+
+	function sp1OnClick() {
+		document.getElementById('sp1').style.display='none'
+	}
+</script>
+
+</body>
+</html>

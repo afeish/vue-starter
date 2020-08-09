@@ -1,0 +1,28 @@
+{
+  "name": "virtual-dom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": " babel src --out-dir lib && browserify lib/app.js -o lib/bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.11.0",
+    "@babel/plugin-transform-arrow-functions": "^7.10.4",
+    "@babel/plugin-transform-modules-amd": "^7.10.5",
+    "@babel/plugin-transform-react-jsx": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-react": "^7.10.4",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.1"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.10.4"
+  }
+}

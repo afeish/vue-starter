@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vue01</title>
+</head>
+<body>
+<!-- vuex  -->
+
+<div id="app">
+	<h3>current done todos size: {{ doneTodosSize }}</h3>
+ 	<table>
+ 		<th>
+ 			<td>id</td>
+ 			<td>content</td>
+ 			<td>isDone</td>
+ 		</th>
+
+ 		<!-- <tr v-for="item in todos">
+ 			<td>{{ item.id }}</td>
+ 			<td>{{ item.content }}</td>
+ 			<td>{{ item.done }}</td>
+
+ 		</tr> -->
+
+ 		<tr v-for="item in doneTodos">
+ 			<td>{{ item.id }}</td>
+ 			<td>{{ item.content }}</td>
+ 			<td>{{ item.done }}</td>
+
+ 		</tr>
+ 	</table>
+
+ 	<hr>
+ 	<p>
+ 		please input the todo id: <input type="text" name="id" v-model="selectTodoId">
+ 		<button @click="queryTodo">query</button>
+
+ 		<div v-if="todo">
+ 			id: {{ todo.id }} <br>
+ 			content: {{ todo.content }} <br>
+ 			done: {{ todo.done }} <br>
+
+ 		</div>
+ 	</p>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuex/dist/vuex.js"></script>
+
+<!-- 
+vuex 的几个常见概念
+1 store
+2 state
+	针对 state 的查询
+	2.1 直接的使用： this.$store.state.isLogin
+	2.2 mapState 取：
+		2.2.1 mapState({ isAuthenticated: 'isLogin' })
+		2.2.2 mapState({ isAuthenticated: (state) => state.isLogin})
+		2.2.3 mapState(['isLogin'])
+	2.3 getters
+		有筛选性的对数据进行查询： this.$store.getters.doneTodos
+		对数据的归并（类似于统计）（比如取一下 array 的 size）
+
+		把对数据的一些操作（查询类，统计类）封装到 getters 里面
+	2.4 mapGetters
+		2.4.1 mapGetters({ isAuthenticated: 'isLogin' })
+		2.4.2 mapGetters({ isAuthenticated: (state) => state.isLogin})
+		2.4.3 mapGetters(['isLogin'])
+
+ -->
+<script type="text/javascript">
+	Vue.use(Vuex)
+
+
+	const store = new Vuex.Store({
+		state: {
+			counter: 0,
+			isLogin: false,
+			todos: [
+				{id: 1, content: 'wash your hands', done: false},
+				{id: 2, content: 'prepare your breakfast', done: true},
+				{id: 3, content: 'study vuex', done: false},
+			]
+		},
+		mutations: {
+			incrementCounter: function(state) {
+				state.counter ++
+			},
+			loginOrLogout(state) {
+				state.isLogin = !state.isLogin
+			}
+		},
+		getters: {
+			doneTodos(state) {
+				// 熟悉 array 的操作， find, filter, map, splice, put, push, shift, unshift
+				return state.todos.filter(elem => elem.done) 
+			},
+			notDoneTodos : (state) => state.todos.filter(elem => !elem.done) ,
+
+			// getters 的函数传递的参数有两个，但是第一个始终是 state， 第二个代表所有的 getters，如果要使用特定的 getter，使用 destructure 获取
+			doneTodosSize: (state, {doneTodos}) => {
+				console.log(state)
+				console.log(doneTodos)
+
+				return doneTodos.length
+			},
+
+			// 上面 3 个定义的 getter 函数的返回值 是一个对象（或者是一个值）
+			// getTodoById(1) 返回的是一个函数，这个函数接受的参数是 id
+			getTodoById: (state) => {
+
+				return (id) => {
+					let val = state.todos.find(elem => elem.id == id)
+					return val
+				}
+			},
+
+			// getTodoById2 这个 getter，接受 state 作为参数，返回一个函数 （返回的函数以 id 为参数）
+			getTodoById2: (state) => (id) => state.todos.find(elem => elem.id == id)
+		}
+	})
+
+	store.commit('incrementCounter')
+
+
+
+	console.log(store.state.counter)
+
+	// 直接使用 store 获取属性（getters）
+	console.log(store.getters.doneTodos)
+
+
+	// mapState 本身并没有改变什么 state， 它仅仅是让你可以通过更加整洁的方式，取出 state 而已
+	let mapState = Vuex.mapState
+
+	let mapGetters = Vuex.mapGetters
+
+
+	var app = new Vue({
+	  el: '#app',
+	  // 传递的一个参数而已，在实际构造这个 vue 对象时，会把 store 的引用赋值给 vue 对象内部的 $store 变量
+	  // 这样，你就可以通过 $store 来访问 vuex 的 store 了
+	  store,
+	  data: {
+	    message: 'Hello Vue!',
+	    localCounter: 1,
+	    selectTodoId: null,
+	    todo: null
+	  },
+
+	  methods: {
+	  	queryTodo() {
+	  		console.log('query todo of id: ' + this.selectTodoId)
+	  		this.todo = this.getTodoById(this.selectTodoId)
+	  	}
+	  },
+	  
+	  computed: {
+	  	// isLogin() {
+	  	// 	//  $http
+	  	// 	console.log('invoking computed isLogin')
+	  	// 	return this.$store.state.isLogin
+	  	// },
+	  	// 希望你给我返回一个对象（其中包含多个 state的属性值），然后直接展开到 computed 属性去
+	  	...mapState({
+	  		// funciton 的值其实是计算属性的值，要在前端页面显示的
+
+	  		// mapState 你给我生成一个 function，名字叫做 isAuthenticated, 当这个函数被执行的时候，它会
+	  		// 调用 （state => state.isLogin），其中的调用时，给他传递的参数为 this.$store.state
+	  		isAuthenticated: state => state.isLogin,
+
+	  		// 下面这句语义是： mapState 你给我生成一个function，名字是 counterVal，这个function 返回的值是 state 中一个叫 counter 的属性的值
+	  		counterVal: 'counter',
+
+	  		todos: 'todos'
+	  	}),
+
+	  	// 最简洁的方式，这时配置的值 即代表了 state 的属性名称，也代表了在页面解析时的值（其实就是计算属性的值）
+	  	// 这种模式下，可以认为 state 属性和计算属性名称相同而已
+	  	// ...mapState(['isLogin', 'counter'])
+
+	  	...mapGetters(['doneTodos', 'doneTodosSize', 'getTodoById']),
+
+	  	counter() {
+	  		return this.$store.state.counter;
+	  	},
+
+	  	// doneTodos() {
+	  	// 	return this.$store.getters.doneTodos
+	  	// }
+
+	  }
+	})
+
+
+
+	// // 实现近似于 vuex 的 mapState 函数
+ 	// function mapState(option) {
+	 //  	option = option || {}
+
+	 //  	res = {}
+
+	 //  	let keys = Object.keys(option)
+
+	 //  	// isLogin, counter
+	 //  	for (let key: keys) {
+
+	 //  		// state => state.isLogin
+	 //  		let origFunc = option[key]
+
+	 //  		// 下一次如果调用 isLogin 时，调用下面
+	 //  		res[key] = function() {
+	 //  			return origFunc(this.$store.state)
+	 //  		}
+	 //  	}
+
+	 //  	// {isLogin: function(){}, counter: function(){}}
+
+	 //  	return res	  		
+	 //  },
+
+</script>
+
+</body>
+</html>

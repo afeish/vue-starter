@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vue06</title>
+</head>
+<body>
+<!-- vuex  -->
+
+<div id="app">
+	<div>current counter: {{ counter }}</div>
+<!-- 	<div>
+		increment: 
+		<button @click="increment">+</button>
+	</div>	
+
+	<div>
+		decrement:
+		<button @click="decrement">-</button>
+	</div> -->
+
+<!-- 	<div>
+		increment: 
+		<button @click="incrementCounter">+</button>
+	</div>	
+
+	<div>
+		decrement:
+		<button @click="decrementCounter">-</button>
+	</div> -->
+	please input your step: <input type="text" name="step" v-model="step">
+	<div>
+		increment: 
+		{{ this.step }}
+		<!-- bind 作用域 -->
+		<button @click="incrementCounterByStep({step: this.app.step})">+</button>
+		<!-- <button @click="aaa(this)">+</button> -->
+
+	</div>	
+
+	<div>
+		decrement:
+		<button @click="decrementCounterByStep({step: this.step})">-</button>
+	</div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuex/dist/vuex.js"></script>
+
+<!-- 
+vuex 的几个常见概念
+1 store
+2 state
+	针对 state 的查询
+	2.1 直接的使用： this.$store.state.isLogin
+	2.2 mapState 取：
+		2.2.1 mapState({ isAuthenticated: 'isLogin' })
+		2.2.2 mapState({ isAuthenticated: (state) => state.isLogin})
+		2.2.3 mapState(['isLogin'])
+	2.3 getters
+		有筛选性的对数据进行查询： this.$store.getters.doneTodos
+		对数据的归并（类似于统计）（比如取一下 array 的 size）
+
+		把对数据的一些操作（查询类，统计类）封装到 getters 里面
+	2.4 mapGetters
+		2.4.1 mapGetters({ isAuthenticated: 'isLogin' })
+		2.4.2 mapGetters({ isAuthenticated: (state) => state.isLogin})
+		2.4.3 mapGetters(['isLogin'])
+
+ -->
+<script type="text/javascript">
+	Vue.use(Vuex)
+
+
+	const store = new Vuex.Store({
+		state: {
+			counter: 0
+		},
+		mutations: {
+			incrementCounter: function(state) {
+				state.counter ++
+			},
+			decrementCounter(state) {
+				state.counter --
+			}, 
+			incrementCounterByStep: function(state, {step}) {
+				console.log(step)
+				state.counter += Number.parseInt(step)
+			},
+			decrementCounterByStep(state, {step}) {
+				state.counter -= Number.parseInt(step)
+			}
+		},
+		
+	})
+
+
+	// mapState 本身并没有改变什么 state， 它仅仅是让你可以通过更加整洁的方式，取出 state 而已
+	let mapState = Vuex.mapState
+
+	let mapGetters = Vuex.mapGetters
+	let mapMutations = Vuex.mapMutations
+
+
+	var app = new Vue({
+	  el: '#app',
+	  // 传递的一个参数而已，在实际构造这个 vue 对象时，会把 store 的引用赋值给 vue 对象内部的 $store 变量
+	  // 这样，你就可以通过 $store 来访问 vuex 的 store 了
+	  store,
+	  data: {
+	  	step: 1
+	  },
+
+	  methods: {
+	  	increment() {
+	  		this.$store.commit('incrementCounter')
+	  	},
+	  	decrement() {
+	  		this.$store.commit('decrementCounter')
+	  	},
+	  	incrementv2() {
+	  		this.$store.commit('incrementCounterByStep', {step: this.step})
+	  	},
+	  	decrementv2() {
+	  		this.$store.commit('decrementCounterByStep', {step: this.step})
+
+	  	},
+	  	incrementv3() {
+	  		this.incrementCounterByStep({step: this.step})
+	  	},
+	  	decrementv3() {
+	  		this.decrementCounterByStep({step: this.step})
+
+	  	},
+
+	  	aaa(param) {
+	  		console.log(param)
+	  	},
+	  	...mapMutations(['incrementCounter', 'decrementCounter', 'incrementCounterByStep', 'decrementCounterByStep'])
+	  },
+	  
+	  computed: {
+
+	  	// 最简洁的方式，这时配置的值 即代表了 state 的属性名称，也代表了在页面解析时的值（其实就是计算属性的值）
+	  	// 这种模式下，可以认为 state 属性和计算属性名称相同而已
+	  	...mapState(['counter'])
+
+	  }
+	})
+
+</script>
+
+</body>
+</html>

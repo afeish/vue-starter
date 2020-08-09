@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>vue01</title>
+</head>
+<body>
+<!-- vuex  -->
+
+<div id="app">
+  {{ message }}
+  <hr>
+  {{ isAuthenticated }}
+  <hr>
+  {{ counterVal }}
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vuex/dist/vuex.js"></script>
+
+<!-- 
+为什么要引入 vuex， 传统的 vue 的编写方式有什么问题？
+1. 集中式的状态管理。 比如对于是否登录。当你登录成功后，你要把登录成功的状态记录到一个地方，这样便于所有的component 都知晓。所以引入了 store的概念。
+引入了 vuex 的 store 的概念后，因为在 state 里面定义的变量其实是全局共享的，是可以通信的。比如component A 想告诉 component B 一件是事情（比如当前的登陆状态变为已登录），component A执行 store.commit('loginNewUser').
+
+扩展一下：如果没有引入 vuex，对于这种全局的状态管理如何操作：
+1）放在浏览器提供的 storage 里面了，比如 	localStorage.setItem('isLogin', true)。component B 要访问时，检测一下 localStorage.getItem('isLogin')
+
+
+2. 更易于 debug
+
+
+
+
+vuex 使用时须知：
+1. state 时基于内存的，每一个 refresh 时，状态可能会丢失。（TODO： 单页应用中，如果 refresh， 如何还能保证原来的状态）：方案一：借助 storage
+
+
+1. state 的概念
+
+2. store 的概念
+
+
+ -->
+<script type="text/javascript">
+
+	const store = new Vuex.Store({
+		state: {
+			counter: 0,
+			isLogin: false
+		},
+		mutations: {
+			incrementCounter: function(state) {
+				state.counter ++
+			},
+			loginOrLogout(state) {
+				state.isLogin = !state.isLogin
+			}
+		}
+	})
+
+	store.commit('incrementCounter')
+
+
+
+	console.log(store.state.counter)
+
+
+	// 让 vue 和 vuex 关联起来，需要两步：
+	// 1. Vue.use(Vuex)
+	// 2. 把你定义的好的 store 放入构建的 vue 实例里面
+	Vue.use(Vuex)
+
+
+	// mapState 本身并没有改变什么 state， 它仅仅是让你可以通过更加整洁的方式，取出 state 而已
+	let mapState = Vuex.mapState
+
+
+
+	var app = new Vue({
+	  el: '#app',
+	  // 传递的一个参数而已，在实际构造这个 vue 对象时，会把 store 的引用赋值给 vue 对象内部的 $store 变量
+	  // 这样，你就可以通过 $store 来访问 vuex 的 store 了
+	  store,
+	  data: {
+	    message: 'Hello Vue!'，
+	    localCounter: 1,
+	  },
+	  
+	  computed: {
+	  	// isLogin() {
+	  	// 	//  $http
+	  	// 	console.log('invoking computed isLogin')
+	  	// 	return this.$store.state.isLogin
+	  	// },
+	  	// 希望你给我返回一个对象（其中包含多个 state的属性值），然后直接展开到 computed 属性去
+	  	...mapState({
+	  		// funciton 的值其实是计算属性的值，要在前端页面显示的
+
+	  		// mapState 你给我生成一个 function，名字叫做 isAuthenticated, 当这个函数被执行的时候，它会
+	  		// 调用 （state => state.isLogin），其中的调用时，给他传递的参数为 this.$store.state
+	  		isAuthenticated: state => state.isLogin,
+
+	  		// 下面这句语义是： mapState 你给我生成一个function，名字是 counterVal，这个function 返回的值是 state 中一个叫 counter 的属性的值
+	  		counterVal: 'counter',
+
+
+	  	}),
+
+	  	// 最简洁的方式，这时配置的值 即代表了 state 的属性名称，也代表了在页面解析时的值（其实就是计算属性的值）
+	  	// 这种模式下，可以认为 state 属性和计算属性名称相同而已
+	  	// ...mapState(['isLogin', 'counter'])
+
+
+	  	counter() {
+	  		return this.$store.state.counter;
+	  	}
+
+	  }
+	})
+
+
+
+	// // 实现近似于 vuex 的 mapState 函数
+ 	// function mapState(option) {
+	 //  	option = option || {}
+
+	 //  	res = {}
+
+	 //  	let keys = Object.keys(option)
+
+	 //  	// isLogin, counter
+	 //  	for (let key: keys) {
+
+	 //  		// state => state.isLogin
+	 //  		let origFunc = option[key]
+
+	 //  		// 下一次如果调用 isLogin 时，调用下面
+	 //  		res[key] = function() {
+	 //  			return origFunc(this.$store.state)
+	 //  		}
+	 //  	}
+
+	 //  	// {isLogin: function(){}, counter: function(){}}
+
+	 //  	return res	  		
+	 //  },
+
+</script>
+
+</body>
+</html>
